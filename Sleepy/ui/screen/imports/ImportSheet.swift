@@ -1023,7 +1023,7 @@ private struct ImportConfirmDialog: View {
                         .foregroundColor(colors.error)
                 }
 
-                TimeSlotEditor(rows: rows, onRowsChange: { newRows in
+                TimeSlotEditor(rows: $rows, onRowsChange: { newRows in
                     rows = newRows
                     onTimeJsonChange(TimeTableUtils.buildTimeJsonFromRows(newRows))
                 }, smartConfig: smartConfig, onSmartConfigChange: { smartConfig = $0 },

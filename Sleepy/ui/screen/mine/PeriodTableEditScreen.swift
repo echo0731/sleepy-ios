@@ -144,7 +144,7 @@ struct PeriodTableEditScreen: View {
                         .buttonStyle(SleepyButtonStyle())
 
                         if timeSlotsExpanded {
-                            TimeSlotEditor(rows: slotRows,
+                            TimeSlotEditor(rows: $slotRows,
                                            onRowsChange: { slotRows = $0 },
                                            smartConfig: smartConfig,
                                            onSmartConfigChange: { smartConfig = $0 })

@@ -77,7 +77,8 @@ struct PeriodTableOption {
 ///  - 仅当调用方传入 periodTableOptions 时第三 Tab 出现(不传 = 旧两 Tab, 兼容既有调用)。
 struct TimeSlotEditor: View {
     @Environment(\.localWakeUpColors) private var colors
-    let rows: [TimeTableUtils.TimeSlotRow]
+    // Read the live rows when a sheet callback fires, not a captured array snapshot.
+    @Binding var rows: [TimeTableUtils.TimeSlotRow]
     let onRowsChange: ([TimeTableUtils.TimeSlotRow]) -> Void
     var smartConfig: SmartPeriodConfig = SmartPeriodConfig()
     var onSmartConfigChange: (SmartPeriodConfig) -> Void = { _ in }
@@ -102,7 +103,7 @@ struct TimeSlotEditor: View {
 
             switch mode {
             case .manual:
-                ManualTimeSlotEditor(rows: rows, onRowsChange: onRowsChange)
+                ManualTimeSlotEditor(rows: $rows, onRowsChange: onRowsChange)
             case .auto:
                 // Bug 2 fix: config 变化立即 merge 同步(保留 edge 行)。调用方不一定回传
                 // smartConfig(ImportSheet 旧接线), 故回调内直接同步; 回传方由 onChange 兜底。
@@ -238,7 +239,8 @@ private struct BindChoiceRow: View {
 // ← ManualTimeSlotEditor
 private struct ManualTimeSlotEditor: View {
     @Environment(\.localWakeUpColors) private var colors
-    let rows: [TimeTableUtils.TimeSlotRow]
+    // Read the live rows when a sheet callback fires, not a captured array snapshot.
+    @Binding var rows: [TimeTableUtils.TimeSlotRow]
     let onRowsChange: ([TimeTableUtils.TimeSlotRow]) -> Void
 
     var body: some View {
@@ -321,8 +323,10 @@ private struct TimeSlotRowItem: View {
                 .frame(width: 44, alignment: .leading)
             TimePickerField(value: row.start, onValueChange: onStartChange,
                             label: L10n.format("start_label"), fillsWidth: true)
+                .accessibilityIdentifier("slot_start_\(row.node)")
             TimePickerField(value: row.end, onValueChange: onEndChange,
                             label: L10n.format("end_label"), fillsWidth: true)
+                .accessibilityIdentifier("slot_end_\(row.node)")
             if canDelete {
                 Button(action: onDelete) {
                     Image(systemName: "minus.circle")

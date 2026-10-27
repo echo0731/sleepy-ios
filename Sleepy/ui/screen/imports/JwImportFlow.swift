@@ -591,7 +591,7 @@ struct JwImportFlow: View {
                         .font(.system(size: 12))   // ← MaterialTheme.typography.bodySmall
                         .foregroundColor(colors.error)
                 }
-                TimeSlotEditor(rows: configRows,
+                TimeSlotEditor(rows: $configRows,
                                onRowsChange: { newRows in
                     configRows = newRows
                     configTimeJson = TimeTableUtils.buildTimeJsonFromRows(newRows)
