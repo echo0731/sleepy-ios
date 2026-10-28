@@ -158,6 +158,9 @@ struct TimePickerField: View {
                     Text(label)
                         .font(.system(size: 16))
                         .foregroundColor(colors.onSurfaceVariant)
+                    Text(L10n.format("slot_pending"))
+                        .font(.system(size: 12))
+                        .foregroundColor(colors.onSurfaceVariant)
                 } else {
                     Text(label)
                         .font(.system(size: 12))

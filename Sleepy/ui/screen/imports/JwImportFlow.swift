@@ -70,6 +70,7 @@ struct JwImportFlow: View {
     @State private var parsedSchool: JwSchoolInfo? = nil
     @State private var draftId: String? = nil
     @State private var configStartDate = ""
+    @State private var configUsedDefaultTimes = false
     @State private var configTimeJson = ""
     @State private var configRows: [TimeTableUtils.TimeSlotRow] = []
     // issue#28 P2 / issue#23 T5: 智慧节次配置播种(解析/草稿恢复两个入口)
@@ -394,15 +395,17 @@ struct JwImportFlow: View {
                                               start: filled?.0 ?? "",
                                               end: filled?.1 ?? "")
         }
-        configRows = newRows
+        let initialized = TimeTableUtils.initialManualRows(newRows)
+        configRows = initialized.rows
+        configUsedDefaultTimes = initialized.usedDefaults
         // 学期起始日预填: JSON 直连协议 (boya_pp/cqu/chaoxing) 能从接口拿到第一周周一
         // (如燕大 2026-2027-1 实为 2026-08-31, 本地 9 月首一推断会差一周), 用户仍可改
         configStartDate = termStartDate
-        configTimeJson = ""
+        configTimeJson = TimeTableUtils.buildTimeJsonFromRows(configRows)
         configTableName = L10n.format("jw_import_title", sch.name)
         // issue#23 T5: 实时确认态与草稿持久化用同一推断结果播种; 行不全 → 简单兜底,
-        // 留在手动校验, 不写猜测值。
-        let inferredSmartConfig = TimeTableUtils.inferSmartPeriodConfig(newRows)
+        // 无法补齐的行留在手动校验，其余使用已提示的默认作息。
+        let inferredSmartConfig = TimeTableUtils.inferSmartPeriodConfig(configRows)
             ?? SmartPeriodConfig(
                 startTime: newRows.first.map { jwIsBlank($0.start) ? "08:00" : $0.start } ?? "08:00",
                 totalPeriods: max(newRows.count, 1))
@@ -411,7 +414,7 @@ struct JwImportFlow: View {
         let snapshot = JwImportDraftSnapshot(
             school: sch,
             courses: courses,
-            periods: newRows.map { JwImportDraftPeriod(node: $0.node, start: $0.start, end: $0.end) },
+            periods: configRows.map { JwImportDraftPeriod(node: $0.node, start: $0.start, end: $0.end) },
             termStartDate: termStartDate,
             tableName: L10n.format("jw_import_title", sch.name),
             smartConfigJson: encodeSmartConfigJson(inferredSmartConfig))
@@ -598,6 +601,7 @@ struct JwImportFlow: View {
                     checkpointDraft()
                 },
                                // issue#28 P2: 智慧节次配置接线(此前默认 no-op → 「添加课间」点了没反应)
+                               usedDefaultTimes: configUsedDefaultTimes,
                                smartConfig: configSmartConfig,
                                onSmartConfigChange: { newConfig in
                     configSmartConfig = newConfig

@@ -1035,3 +1035,7 @@
 "timeslot_drop_success" = "第 %1$d 節を位置 %2$d に並び替えました";
 "timeslot_reorder_in_progress" = "並び替え中";
 "timeslot_row_drop_target" = "ここにドロップ";
+
+"slot_defaults_notice" = "Some times use the default bell schedule. Please check them against your school’s schedule.";
+"slot_missing_notice" = "Some times are not set. Set them before saving.";
+"slot_pending" = "Not set";

@@ -80,6 +80,7 @@ struct TimeSlotEditor: View {
     // Read the live rows when a sheet callback fires, not a captured array snapshot.
     @Binding var rows: [TimeTableUtils.TimeSlotRow]
     let onRowsChange: ([TimeTableUtils.TimeSlotRow]) -> Void
+    var usedDefaultTimes = false
     var smartConfig: SmartPeriodConfig = SmartPeriodConfig()
     var onSmartConfigChange: (SmartPeriodConfig) -> Void = { _ in }
     var periodTableOptions: [PeriodTableOption] = []
@@ -91,6 +92,12 @@ struct TimeSlotEditor: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            if usedDefaultTimes {
+                Text(L10n.format("slot_defaults_notice"))
+                    .font(SleepyTypography.bodySmall)
+                    .foregroundColor(colors.onSurfaceVariant)
+                    .padding(.bottom, 8)
+            }
             // ===== Tab 切换 =====
             ModeTabSwitch(
                 current: mode,
@@ -245,6 +252,12 @@ private struct ManualTimeSlotEditor: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            if rows.contains(where: { $0.start.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || $0.end.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) {
+                Text(L10n.format("slot_missing_notice"))
+                    .font(SleepyTypography.bodySmall)
+                    .foregroundColor(colors.error)
+                    .padding(.bottom, 8)
+            }
             // Header
             HStack {
                 Text(L10n.format("n_periods", rows.count))
