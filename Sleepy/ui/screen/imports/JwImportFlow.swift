@@ -258,6 +258,7 @@ struct JwImportFlow: View {
             termStartDate: configStartDate,
             tableName: configTableName,
             smartConfigJson: encodeSmartConfigJson(configSmartConfig),
+            usedDefaultTimes: configUsedDefaultTimes,
             phase: parsedCourses.isEmpty ? .webViewLogin : .configureConfirm)
     }
 
@@ -298,6 +299,8 @@ struct JwImportFlow: View {
             configRows = snapshot.periods.map {
                 TimeTableUtils.TimeSlotRow(node: $0.node, start: $0.start, end: $0.end)
             }
+            // 补齐标志随快照恢复 — 默认作息提示不因退出重进而丢失
+            configUsedDefaultTimes = snapshot.usedDefaultTimes
             configTimeJson = TimeTableUtils.buildTimeJsonFromRows(configRows)
             // issue#23 T5: 草稿已存配置仍能 derive 出恢复的行 → 原样保留; 缺失/损坏 →
             // 从恢复行重推断; 行不可推断 → 保底默认(TimeSlotEditor 保持手动 + 既有校验兜底)。
@@ -417,7 +420,8 @@ struct JwImportFlow: View {
             periods: configRows.map { JwImportDraftPeriod(node: $0.node, start: $0.start, end: $0.end) },
             termStartDate: termStartDate,
             tableName: L10n.format("jw_import_title", sch.name),
-            smartConfigJson: encodeSmartConfigJson(inferredSmartConfig))
+            smartConfigJson: encodeSmartConfigJson(inferredSmartConfig),
+            usedDefaultTimes: configUsedDefaultTimes)
         let repo = draftRepository
         draftId = await Task.detached(priority: .userInitiated) {
             try? repo.save(snapshot, sourceType: "jw", sourceUrl: sch.url)
