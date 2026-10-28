@@ -140,6 +140,9 @@ struct TimePickerField: View {
     let label: String
     // ← Android weight(1f)/fillMaxWidth 调用方传 true, 字段吃满可用宽
     var fillsWidth: Bool = false
+    // 「待设置」副行仅限手动作息编辑(需求侧空态提示); 其余调用方(加课/自动节次/
+    // 提醒时间)保持 Android 原形态: 空值 = label 单独占位。
+    var showsPendingHint: Bool = false
 
     // One presentation owns one draft. Do not share the wheel's state with the
     // presenting row: the sheet can outlive a render of that row.
@@ -158,9 +161,11 @@ struct TimePickerField: View {
                     Text(label)
                         .font(.system(size: 16))
                         .foregroundColor(colors.onSurfaceVariant)
-                    Text(L10n.format("slot_pending"))
-                        .font(.system(size: 12))
-                        .foregroundColor(colors.onSurfaceVariant)
+                    if showsPendingHint {
+                        Text(L10n.format("slot_pending"))
+                            .font(.system(size: 12))
+                            .foregroundColor(colors.onSurfaceVariant)
+                    }
                 } else {
                     Text(label)
                         .font(.system(size: 12))

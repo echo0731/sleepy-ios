@@ -335,10 +335,12 @@ private struct TimeSlotRowItem: View {
                 .foregroundColor(colors.onSurface)
                 .frame(width: 44, alignment: .leading)
             TimePickerField(value: row.start, onValueChange: onStartChange,
-                            label: L10n.format("start_label"), fillsWidth: true)
+                            label: L10n.format("start_label"), fillsWidth: true,
+                            showsPendingHint: true)
                 .accessibilityIdentifier("slot_start_\(row.node)")
             TimePickerField(value: row.end, onValueChange: onEndChange,
-                            label: L10n.format("end_label"), fillsWidth: true)
+                            label: L10n.format("end_label"), fillsWidth: true,
+                            showsPendingHint: true)
                 .accessibilityIdentifier("slot_end_\(row.node)")
             if canDelete {
                 Button(action: onDelete) {
